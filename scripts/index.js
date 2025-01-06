@@ -182,7 +182,8 @@ function mousePressed() {
 /**
  * p5 keyPressed event handler handles key inputs
  *
- * c clears the screen, backspace removes the last iem
+ * c clears the screen, backspace removes the last item
+ * number keys select items
  */
 function keyPressed() {
   // if c is pressed, removes all items
