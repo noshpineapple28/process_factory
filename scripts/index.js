@@ -2,6 +2,7 @@
 let selectedItem = 0; // controleld by mouse move
 const items = ["rect", "ellipse", "tri"]; // items to select
 const itemSize = 15; // the size of one item
+const pos = { x: 0, y: 0 };
 // obj literals for now
 /**
  * type: any string in items
@@ -30,7 +31,7 @@ function renderItem(item) {
         item.y + itemSize,
         item.x + itemSize,
         item.y + itemSize,
-        item.x + itemSize/2,
+        item.x + itemSize / 2,
         item.y
       );
       break;
@@ -50,7 +51,7 @@ function uiBar() {
   for (let i = 0; i < numItems; i++) {
     // temporary style changes
     push();
-    
+
     /* STYLE CHAGES */
     // default to light stroke weight
     strokeWeight(1);
@@ -62,12 +63,12 @@ function uiBar() {
       strokeWeight(2);
     }
     /* END STYLE CHAGES */
-    
+
     // brnd
     rect(uiStartPos + i * cellSize, height - cellSize, cellSize, cellSize);
     // clear temp style changes
     pop();
-    
+
     // render the item
     renderItem({
       type: items[i],
@@ -75,6 +76,24 @@ function uiBar() {
       y: height - cellSize + cellSize / 4,
     });
   }
+}
+
+/**
+ * if a movement key is pressed, moves the camera position
+ * if shift is pressed, double the movement speed
+ * @returns none
+ */
+function moveCamera() {
+  if (!keyIsPressed) return;
+
+  const speed = 5;
+  let modifier = 1;
+  if (keyIsDown(SHIFT)) modifier = 2;
+
+  if (keyIsDown(87) || keyIsDown(UP_ARROW)) pos.y += speed * modifier;
+  if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) pos.x += speed * modifier;
+  if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) pos.y -= speed * modifier;
+  if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) pos.x -= speed * modifier;
 }
 
 /* MAIN METHODS */
@@ -100,7 +119,17 @@ function setup() {
  * main program loop
  */
 function draw() {
+  push();
+  // check to see if we can move the camera
+  moveCamera();
+  translate(pos.x, pos.y);
   background(150);
+
+  // draw the placed items
+  for (const item of placed) {
+    renderItem(item);
+  }
+  pop();
 
   // basic case statement
   renderItem({
@@ -108,11 +137,6 @@ function draw() {
     x: mouseX,
     y: mouseY,
   });
-
-  // draw the placed items
-  for (const item of placed) {
-    renderItem(item);
-  }
 
   // ui rendered last ofc
   uiBar();
@@ -150,7 +174,20 @@ function mousePressed() {
   // add the selected item
   placed.push({
     type: items[selectedItem],
-    x: mouseX,
-    y: mouseY,
+    x: mouseX - pos.x,
+    y: mouseY - pos.y,
   });
+}
+
+/**
+ * p5 keyPressed event handler handles key inputs
+ *
+ * c clears the screen, backspace removes the last iem
+ */
+function keyPressed() {
+  // if c is pressed, removes all items
+  if (key === "c" && placed.length) placed.splice(0, placed.length);
+  // key var doesn't hold non char/num keys so use keyCode
+  if (keyCode === BACKSPACE && placed.length)
+    placed.splice(placed.length - 1, 1);
 }
