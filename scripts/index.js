@@ -190,4 +190,15 @@ function keyPressed() {
   // key var doesn't hold non char/num keys so use keyCode
   if (keyCode === BACKSPACE && placed.length)
     placed.splice(placed.length - 1, 1);
+
+  // key is number check
+  let keyNum = parseInt(key);
+  // value checking, if valid, set selecting item to that number
+  if (
+    typeof keyNum === "number" &&
+    !isNaN(keyNum) &&
+    keyNum > 0 &&
+    keyNum <= items.length
+  )
+    selectedItem = parseInt(key) - 1;
 }
